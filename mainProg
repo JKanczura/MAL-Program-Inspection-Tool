@@ -1,4 +1,59 @@
-ut);                    //adds a space
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#define MAX_CHAR 100         //Maximum lengths of char variables
+#define MAX_LINES 100        //Maximum lengths of char variables
+
+int main (int argc, char *argv[])  //accepts flag, input file, and output file from command line
+{
+
+  FILE *fileInput;                //pointer to file being read
+  FILE *fileOutput;               //pointer to file being written to
+  FILE *secondRead;              //pointer to another read of the file being read
+  FILE *thirdRead;              // a third read of the above file
+
+  char line[MAX_CHAR];          //storage for line being read
+  char *lines[MAX_LINES];
+  char *eof;
+  char flag[100];              //storage for statement describing action of program
+  char identifier[100];        //storage for identifier, once found in code
+  char definition[100];         //character value for the line number the identifier is defined on
+  char whereDefinitionIsUsed[10];  //character value for line# where identifier is used
+  int lineNumber = 1;
+  char *newLines[MAX_LINES];
+  char *newEOF;
+  char newLine[MAX_CHAR];
+  char newDefinition[100];
+  char *tokenized;
+  char textLine[100];
+  char numberLine[100];
+
+  fileInput = fopen(argv[2],"r");       //opens input file to be read
+  fileOutput = fopen(argv[3],"a");      //opens output file to be appended
+  secondRead = fopen(argv[2], "r");     //opens input file to be read a second time
+  thirdRead = fopen(argv[2], "r");      //same file, read a third time
+
+  int i = 0;                            //used to cycle through array
+  int j = 0;                            //used to cycle through another array
+
+
+  if (strcmp(argv[1], "-l") == 0)       //identifies if flag entered is -l
+    {
+      sprintf(flag, "\nProgram listing for %s:\n\n", argv[2]);  //header
+      fputs(flag, fileOutput);
+
+      while ((eof = fgets(line, MAX_LINES, fileInput)) != NULL) //cycles through entire file
+        {
+          lines[i] = strdup(eof);                     //inputs current line into array
+
+          if ((strcmp(line, "\n") != 0) && (strcmp(line, "\r\n") != 0) &&
+              (strcmp(line, " ") != 0))                      //determines if line is newline
+            {
+              sprintf(textLine, "%s", lines[i]);            //makes line a single string
+              sprintf(numberLine, "%d", lineNumber);
+              fputs(numberLine, fileOutput);               //puts line number into file before line
+              fputs(" ", fileOutput);                    //adds a space
               fputs(textLine, fileOutput);             //inputs the line data to file
               i++;
               lineNumber++;                          //iterates count of lines
