@@ -1,0 +1,164 @@
+ut);                    //adds a space
+              fputs(textLine, fileOutput);             //inputs the line data to file
+              i++;
+              lineNumber++;                          //iterates count of lines
+            }
+          else
+            {
+              fputs("\n", fileOutput);              //if the line was a newline, adds newline without a line number
+            }
+        }
+    }
+
+  else if (strcmp(argv[1], "-c") == 0)           //determines flag inputted is -c
+    {
+      sprintf(flag, "\nCross reference table for %s:\n\n", argv[2]);  //header
+      fputs(flag, fileOutput);
+      fputs("Identifier\t\tDefinition\t\tUsed\n", fileOutput);      //header for table columns
+      int newLineNumber = 0;                                       //sets newLineNumber equal to 0
+      lineNumber = 0;
+
+      while ((eof = fgets(line, MAX_LINES, fileInput)) != NULL)     //continue until end of file
+        {
+          lines[i] = strdup(eof);                                  //inputs data into array of lines
+          if (strcmp(line, "\n"))                                //checks if line is newline
+            {
+              int newLineNumber = 0;
+              lineNumber++;
+              if ((strcmp(line, "\n") != 0) && (strcmp(line, "\r\n") != 0) && (line[0] != '#')) //checks if line contains relevant data
+                {
+                  if (strchr(line, ':') != NULL) //determines if identifier, identifiers have colons
+                    {
+                      strcpy(identifier, strtok(line, ":")); //tokenizes the string before the colon
+                      sprintf(definition, "%d", lineNumber);
+                      fputs(identifier, fileOutput);        //inputs identifier value to file
+                      fputs("\t\t\t\t", fileOutput);
+                      fputs(definition, fileOutput);        //inputs line number where defined
+                      fputs("\t\t", fileOutput);
+                      while ((newEOF = fgets(newLine, MAX_LINES, thirdRead)) != NULL) //cycles through second read of file to end
+                        {
+                          int k = 0;
+                          newLines[k] = strdup(newEOF); //inputs lines into array
+                          if (strcmp(newLine, "\n"))    //checks if line is newline
+                            {
+                              newLineNumber++;          //iterates line count
+                              if ((strcmp(newLine, "\n") != 0) && (strcmp(newLine, "\r\n") != 0) && (newLine[0] != '#')) //checks for comment lines
+                                {
+                                  tokenized = strtok(newLine, "#");                                                //tokenizes after # to exclude comments
+                                  if ((strstr(tokenized, identifier)) && ((newLineNumber != lineNumber)))         //checks if the line contains the identifier
+                                    {
+                                      sprintf(newDefinition, "%d", newLineNumber);                           //inputs line number of used identifier
+                                      fputs(newDefinition, fileOutput);
+                                      fputs(" ", fileOutput);
+
+                                    }
+                                }
+                            }
+                        }
+                      fputs("\n", fileOutput);
+                    }
+
+                  else if (strstr(identifier, lines[i]))
+                    {
+                      sprintf(whereDefinitionIsUsed, "%d", lineNumber);
+                      fputs(whereDefinitionIsUsed, fileOutput);
+                    }
+                }
+            }
+          rewind(thirdRead);                                                                   //rewinds the file read to be used again
+        }
+    }
+
+else if (strcmp(argv[1], "-b") == 0)                                                 //determines if flag inputed is -b
+    {
+      sprintf(flag, "\nProgram listing for %s:\n\n", argv[2]);              //header
+      fputs(flag, fileOutput);
+
+      while ((eof = fgets(line, MAX_LINES, fileInput)) != NULL)                 //contains same data as -l flag
+        {
+          lines[j] = strdup(eof);
+
+          if ((strcmp(line, "\n") != 0) && (strcmp(line, "\r\n") != 0) &&
+              (strcmp(line, " ") != 0))
+            {
+              sprintf(textLine, "%s", lines[j]);
+              sprintf(numberLine, "%d", lineNumber);
+              fputs(numberLine, fileOutput);
+              fputs(" ", fileOutput);
+              fputs(textLine, fileOutput);
+              j++;
+              lineNumber++;
+            }
+          else
+            {
+              fputs("\n", fileOutput);
+            }
+        }
+
+
+      sprintf(flag, "\nCross reference table for %s:\n\n", argv[2]);    //second header
+      fputs(flag, fileOutput);
+      fputs("Identifier\t\tDefinition\t\tUsed\n", fileOutput);
+      int newLineNumber = 0;
+      lineNumber = 0;
+
+      while ((eof = fgets(line, MAX_LINES, secondRead)) != NULL)        //contains same data as -c flag
+
+        {
+          lines[i] = strdup(eof);
+          if (strcmp(line, "\n"))
+            {
+              int newLineNumber = 0;
+              lineNumber++;
+              if ((strcmp(line, "\n") != 0) && (strcmp(line, "\r\n") != 0) && (line[0] != '#'))
+                {
+                  if (strchr(line, ':') != NULL)
+                    {
+                      strcpy(identifier, strtok(line, ":"));
+                      sprintf(definition, "%d", lineNumber);
+                      fputs(identifier, fileOutput);
+                      fputs("\t\t\t\t", fileOutput);
+                      fputs(definition, fileOutput);
+                      fputs("\t\t", fileOutput);
+                      while ((newEOF = fgets(newLine, MAX_LINES, thirdRead)) != NULL)
+                        {
+                          int k = 0;
+                          newLines[k] = strdup(newEOF);
+                          if (strcmp(newLine, "\n"))
+                            {
+                              newLineNumber++;
+                              if ((strcmp(newLine, "\n") != 0) && (strcmp(newLine, "\r\n") != 0) && (newLine[0] != '#'))
+                                {
+                                  tokenized = strtok(newLine, "#");
+                                  if ((strstr(tokenized, identifier)) && ((newLineNumber != lineNumber)))
+                                    {
+                                      sprintf(newDefinition, "%d", newLineNumber);
+                                      fputs(newDefinition, fileOutput);
+                                      fputs(" ", fileOutput);
+
+                                    }
+                                }
+                            }
+                        }
+                      fputs("\n", fileOutput);
+                    }
+
+                  else if (strstr(identifier, lines[i]))
+                    {
+                      sprintf(whereDefinitionIsUsed, "%d", lineNumber);
+                      fputs(whereDefinitionIsUsed, fileOutput);
+                    }
+                }
+            }
+          rewind(thirdRead);
+
+        }
+    }
+  else {
+    fprintf(stderr, "This is an improper flag.\n");  //error message if an improper flag is inputted
+    close(1);                                        //closes program if flag is wrong
+  }
+  fclose(fileInput);                              //closes the input file
+  return 0;                                      //ends the program
+
+}                                               //end of main
